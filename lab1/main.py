@@ -1,8 +1,3 @@
-# -----------------------------------------------------------------------------
-# calc.py
-#
-# A simple calculator with variables -- all in one file.
-# -----------------------------------------------------------------------------
 keywords = {
     keyword: keyword.upper()
     for keyword in [
@@ -12,13 +7,12 @@ keywords = {
 }
 
 tokens = (
-    'NAME', 'ASSIGN', 'FLOAT_NUMBER', 'NUMBER',
+    *keywords.values(),
+    'ASSIGN', 'FLOAT_NUMBER', 'NUMBER',
     'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
     'LPAREN', 'RPAREN', 'PLUS_MATRIX', 'MINUS_MATRIX', "TIMES_MATRIX", 'DIVIDE_MATRIX', 'INCREMENT',
     'DECREMENT', 'MULTIPLY_ASSIGN', 'DIVIDE_ASSIGN', 'LESSER', 'GREATER', 'LESSER_EQUAL', 'GREATER_EQUAL', 'EQUALS',
-    'NOT_EQUAL', 'LPAREN_SQ', 'RPAREN_SQ', 'LPAREN_F', 'RPAREN_F', 'TRANSPOSE', 'RANGE', 'COMMA', 'SEMICOLON',
-
-*keywords.values(),
+    'NOT_EQUAL', 'LPAREN_SQ', 'RPAREN_SQ', 'LPAREN_F', 'RPAREN_F', 'TRANSPOSE', 'RANGE', 'COMMA', 'SEMICOLON', 'ID'
 )
 
 # Tokens
@@ -61,23 +55,11 @@ t_RANGE = r':'
 t_COMMA = r','
 t_SEMICOLON = r';'
 
-
-t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
+# t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
 # t_STRING = r'"[a-zA-Z_][a-zA-Z0-9_]*"'
 
-#todo float :)
-# t_FLOAT_NUMBER = r'(\d*\.\d+)|(\d+\.\d*)'
 t_FLOAT_NUMBER = r"[-+]?\d*\.\d+|\d+"
-# def t_FLOAT_NUMBER(t):
-#     r'(\d*\.\d+)|(\d+\.\d*)'
-#     # '[-+]?[0-9]+(\.([0-9]+)?([eE][-+]?[0-9]+)?|[eE][-+]?[0-9]+)'
-#
-#     try:
-#         t.value = float(t.value)
-#     except ValueError:
-#         print("Integer value too large %d", t.value)
-#         t.value = 0
-#     return t
+
 
 def t_NUMBER(t):
     r'\d+'
@@ -88,9 +70,23 @@ def t_NUMBER(t):
         t.value = 0
     return t
 
+
+def t_FLOATNUMBER(t):
+    r"(?:\d+\.\d*|\.\d+)(?:[eE]-?\d+)?|\d+[eE]-?\d+"
+    t.value = float(t.value)
+    return t
+
+
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = keywords.get(t.value, 'ID')
+    return t
+
+
 # Ignored characters
 t_ignore = " \t"
 
+t_ignore_COMMENT = r'[#].*'
 
 
 def t_newline(t):
@@ -110,16 +106,17 @@ lexer = lex.lex()
 
 text = """
     A = zeros(5);  # create 5x5 matrix filled with zeros
-B = ones(7);   # create 7x7 matrix filled with ones
-I = eye(10);   # create 10x10 matrix filled with ones on diagonal and zeros elsewhere
-D1 = A.+B' ; # add element-wise A with transpose of B
-D2 -= A.-B' ; # substract element-wise A with transpose of B
-D3 *= A.*B' ; # multiply element-wise A with transpose of B
-D4 /= A./B' ; # divide element-wise A with transpose of B
+    B = ones(7);   # create 7x7 matrix filled with ones
+    I = eye(10);   # create 10x10 matrix filled with ones on diagonal and zeros elsewhere
+    D1 = A.+B' ; # add element-wise A with transpose of B
+    D2 -= A.-B' ; # substract element-wise A with transpose of B
+    D3 *= A.*B' ; # multiply element-wise A with transpose of B
+    D4 /= A./B' ; # divide element-wise A with transpose of B
+    """
 
-"""
+
 def tokens(input):
-    lexer.input(text)
+    lexer.input(input)
     while token := lexer.token():
         yield token
 
