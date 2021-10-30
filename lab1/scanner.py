@@ -17,7 +17,8 @@ tokens = (
     'PLUS_MATRIX', 'MINUS_MATRIX', "TIMES_MATRIX", 'DIVIDE_MATRIX', 'TRANSPOSE',
     'INCREMENT', 'DECREMENT', 'MULTIPLY_ASSIGN', 'DIVIDE_ASSIGN',
     'LESSER', 'GREATER', 'LESSER_EQUAL', 'GREATER_EQUAL', 'EQUALS', 'NOT_EQUAL',
-    'RANGE', 'COMMA', 'SEMICOLON', 'ID'
+    'RANGE', 'COMMA', 'SEMICOLON', 'ID',
+    'STRING'
 )
 
 # Tokens
@@ -27,7 +28,7 @@ t_MINUS = r'-'
 t_TIMES = r'\*'
 t_DIVIDE = r'/'
 
-t_PLUS_MATRIX = r'\.+'
+t_PLUS_MATRIX = r'\.\+'
 t_MINUS_MATRIX = r'\.-'
 t_TIMES_MATRIX = r'\.\*'
 t_DIVIDE_MATRIX = r'\./'
@@ -50,7 +51,7 @@ t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_LPAREN_SQ = r'\['
 t_RPAREN_SQ = r']'
-t_LPAREN_F = r'}'
+t_LPAREN_F = r'{'
 t_RPAREN_F = r'}'
 
 t_TRANSPOSE = r'\''
@@ -59,6 +60,8 @@ t_RANGE = r':'
 
 t_COMMA = r','
 t_SEMICOLON = r';'
+
+t_STRING = r'\".*\"|\'.*\''
 
 
 def t_FLOATNUMBER(t):
@@ -83,6 +86,7 @@ def t_ID(t):
     return t
 
 
+
 # Ignored characters
 t_ignore = " \t"
 
@@ -95,11 +99,9 @@ def t_newline(t):
 
 
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    print(f"Illegal character '{t.value[0]}' in line {t.lineno}")
     t.lexer.skip(1)
 
 
 # Build the lexer
-class Scanner:
-    def __init__(self):
-        self.lexer = lex.lex()
+lexer = lex.lex()
