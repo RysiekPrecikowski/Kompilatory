@@ -66,7 +66,7 @@ t_STRING = r'\"[^\"]*\"|\'[^\']*\''
 
 def t_FLOATNUMBER(t):
     r"(?:\d+\.\d*|\.\d+)(?:[eE]-?\d+)?|\d+[eE]-?\d+"
-    t.value = float(t.value)
+    # t.value = float(t.value)
     return t
 
 
