@@ -11,7 +11,7 @@ precedence = (
     ('right', "ONES", "ZEROS", "EYE"),
     ("left", "TRANSPOSE"),
     ("right", "RANGE"),
-    ("left", "UMINUS"),
+    ("right", "UMINUS"),
     ("nonassoc", "IFX"),
     ("nonassoc", "ELSE"),
 )
@@ -147,8 +147,6 @@ def p_epxr(p):
          | empty
          | idx
          | expr TRANSPOSE
-    list : expr
-         | list COMMA expr
     """
 
 
@@ -157,14 +155,19 @@ def p_if_stmt(p):
     if_stmt : IF LPAREN expr RPAREN stmt %prec IFX
             | IF LPAREN expr RPAREN stmt ELSE stmt
     """
+    # pierwsza produckcja (%prec IFX) - gdy nie wiemy do ktorego ifa ma byc else
 
-def p_loop_stmt(p):
+def p_while_stmt(p):
     """
     while_stmt : WHILE LPAREN expr RPAREN stmt
-    range : expr RANGE expr
-    for_stmt : FOR ID ASSIGN range stmt
     """
 
+
+def p_for_stmt(p):
+    """
+    for_stmt : FOR ID ASSIGN range stmt
+    range : expr RANGE expr
+    """
 
 
 def p_print(p):
