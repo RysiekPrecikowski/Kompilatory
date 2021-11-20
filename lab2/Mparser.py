@@ -1,5 +1,5 @@
 
-from lab1_package import scanner
+from lab1 import scanner
 import ply.yacc as yacc
 
 tokens = scanner.tokens

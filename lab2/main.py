@@ -1,7 +1,7 @@
 
 import sys
 
-from lab1_package import scanner
+from lab1 import scanner
 import Mparser
 
 if __name__ == '__main__':
