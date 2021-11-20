@@ -1,14 +1,18 @@
 #!/usr/bin/python
 
-import scanner
+from lab1_package import scanner
 import ply.yacc as yacc
 
 tokens = scanner.tokens
 
 precedence = (
-    # to fill ...
-    ("left", 'PLUS'),
-    # to fill ...
+    ("left", "ASSIGN"),
+    ("left", "LESSER"),
+    ("left", "PLUS"),
+    ("left", "TIMES"),
+
+    # ("nonassoc", "IFX"),
+    # ("nonassoc", "ELSE"),
 )
 
 
@@ -21,22 +25,22 @@ def p_error(p):
 
 def p_program(p):
     """program : instructions_opt"""
-
-
-def p_instructions_opt_1(p):
-    """instructions_opt : instructions """
-
-
-def p_instructions_opt_2(p):
-    """instructions_opt : """
-
-
-def p_instructions_1(p):
-    """instructions : instructions instruction """
-
-
-def p_instructions_2(p):
-    """instructions : instruction """
+#
+#
+# def p_instructions_opt(p):
+#     """instructions_opt :"""
+#
+#
+# def p_instructions_opt_2(p):
+#     """instructions_opt : """
+#
+#
+# def p_instructions_1(p):
+#     """instructions : instructions instruction """
+#
+#
+# def p_instructions_2(p):
+#     """instructions : instruction """
 
 
 # to finish the grammar

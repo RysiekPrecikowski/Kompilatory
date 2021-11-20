@@ -61,7 +61,7 @@ t_RANGE = r':'
 t_COMMA = r','
 t_SEMICOLON = r';'
 
-t_STRING = r'\".*\"|\'.*\''
+t_STRING = r'\"[^\"]*\"|\'[^\']*\''
 
 
 def t_FLOATNUMBER(t):
@@ -90,7 +90,7 @@ def t_ID(t):
 # Ignored characters
 t_ignore = " \t"
 
-t_ignore_COMMENT = r'[#].*'
+t_ignore_COMMENT = r'\#.*'
 
 
 def t_newline(t):
