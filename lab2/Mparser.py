@@ -1,6 +1,8 @@
 from lab1 import scanner
 import ply.yacc as yacc
 
+from lab3 import AST
+
 tokens = scanner.tokens
 
 precedence = (
@@ -24,11 +26,20 @@ def p_error(p):
         print("Unexpected end of input")
 
 
-def p_program(p):
+
+def p_program_simple(p):
     """
-    program : stmt
-            | program stmt
+    program: stmt
     """
+    p[0] = AST.ProgramBlock(p[1])
+
+def p_program_add(p):
+    """
+    program : program stmt
+    """
+    program_block = p[1]
+    program_block.stmts.append(p[2])
+    p[0] = program_block
 
 
 def p_stmt(p):
@@ -48,6 +59,8 @@ def p_stmt(p):
               | stmt_list stmt
     """
 
+def p_stmt_semicolon(p):
+    pass
 
 def p_comparison(p):
     """
@@ -70,14 +83,37 @@ def p_operator(p):
     """
 
 
-def p_type_recognition(p):
+# def p_type_recognition(p):
+#     """
+#     type_recognition : Variable
+#                      | intNum
+#                      | floatNum
+#                      | string
+#     """
+
+def p_Variable(p):
     """
     type_recognition : ID
-                     | NUMBER
-                     | FLOATNUMBER
-                     | STRING
     """
+    p[0] = AST.Variable(p[1])
 
+def p_intNum(p):
+    """
+    type_recognition : NUMBER
+    """
+    p[0] = AST.IntNum(p[1])
+
+def p_floatNum(p):
+    """
+    type_recognition : FLOATNUMBER
+    """
+    p[0] = AST.FloatNum(p[1])
+
+def p_string(p):
+    """
+    type_recognition : STRING
+    """
+    p[0] = AST.String(p[1])
 
 def p_single_operation(p):
     """
@@ -125,7 +161,7 @@ def p_empty(p):
     """
     empty : LPAREN_SQ RPAREN_SQ
     """
-
+    # p[0]
 
 def p_special_matrix(p):
     """

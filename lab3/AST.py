@@ -18,6 +18,11 @@ class Variable(Node):
         self.name = name
 
 
+class String(Node):
+    def __init__(self, value):
+        self.value = value
+
+
 class BinExpr(Node):
     def __init__(self, op, left, right):
         self.op = op
@@ -25,6 +30,9 @@ class BinExpr(Node):
         self.right = right
 
 
+class ProgramBlock(Node):
+    def __init__(self, stmt):
+        self.stmts = [stmt]
 # ...
 # fill out missing classes
 # ...
