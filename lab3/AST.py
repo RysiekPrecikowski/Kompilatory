@@ -1,11 +1,10 @@
-
 class Node(object):
     pass
-
 
 class IntNum(Node):
     def __init__(self, value):
         self.value = value
+
 
 class FloatNum(Node):
 
@@ -33,6 +32,7 @@ class BinExpr(Node):
 class UnaryMinus(Node):
     def __init__(self, expr):
         self.expr = expr
+
 
 class ProgramBlock(Node):
     def __init__(self, stmt=None):
@@ -118,6 +118,7 @@ class MatrixReference(Node):
     def __init__(self, target, idx):
         self.target = target
         self.idx = idx
+
 
 class Error(Node):
     def __init__(self):

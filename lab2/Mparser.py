@@ -1,6 +1,6 @@
-from lab1 import scanner
 import ply.yacc as yacc
 
+from lab1 import scanner
 from lab3 import AST
 from lab3 import TreePrinter
 
@@ -29,12 +29,12 @@ def p_error(p):
         print("Unexpected end of input")
 
 
-
 def p_program_simple(p):
     """
     program : stmt
     """
     p[0] = AST.ProgramBlock(p[1])
+
 
 def p_program_add(p):
     """
@@ -118,6 +118,7 @@ def p_comparison(p):
                | expr EQUALS expr
                | expr NOT_EQUAL expr
     """
+    p[0] = AST.BinExpr(p[2], [1], p[3])
 
 
 def p_operator(p):
@@ -127,7 +128,13 @@ def p_operator(p):
              | expr TIMES expr
              | expr DIVIDE expr
     """
+    p[0] = AST.BinExpr(p[2], p[1], p[3])
 
+def p_uminus(p):
+    """
+    operator : MINUS expr %prec UMINUS
+    """
+    p[0] = AST.UnaryMinus(p[2])
 
 # def p_type_recognition(p):
 #     """
@@ -143,11 +150,13 @@ def p_Variable(p):
     """
     p[0] = AST.Variable(p[1])
 
+
 def p_intNum(p):
     """
     type_recognition : NUMBER
     """
     p[0] = AST.IntNum(p[1])
+
 
 def p_floatNum(p):
     """
@@ -155,11 +164,13 @@ def p_floatNum(p):
     """
     p[0] = AST.FloatNum(p[1])
 
+
 def p_string(p):
     """
     type_recognition : STRING
     """
     p[0] = AST.String(p[1])
+
 
 def p_single_operation(p):
     """
@@ -169,6 +180,7 @@ def p_single_operation(p):
                      | ID MULTIPLY_ASSIGN expr
                      | ID DIVIDE_ASSIGN expr
     """
+    p[0] = AST.Assign(p[2], p[1], p[3], )
 
 
 def p_expression_operation(p):
@@ -178,6 +190,7 @@ def p_expression_operation(p):
                          | expr TIMES_MATRIX expr
                          | expr DIVIDE_MATRIX expr
     """
+    p[0] = AST.BinExpr(p[2], [1], p[3])
 
 
 def p_matrix_element_operation(p):
@@ -188,6 +201,7 @@ def p_matrix_element_operation(p):
                              | expr idx MULTIPLY_ASSIGN expr
                              | expr idx DIVIDE_ASSIGN expr
     """
+    p[0] = AST.MatrixOperation(p[3], p[1], p[2], p[4])
 
 
 def p_idx(p):
@@ -215,12 +229,14 @@ def p_empty(p):
     """
     p[0] = AST.IDX()
 
+
 def p_special_matrix(p):
     """
     special_matrix : EYE LPAREN expr RPAREN
                    | ONES LPAREN expr RPAREN
                    | ZEROS LPAREN expr RPAREN
     """
+    p[0] = AST.FunctionCall(p[1], p[3])
 
 
 def p_epxr(p):
@@ -234,22 +250,36 @@ def p_epxr(p):
          | special_matrix
          | empty
          | idx
-         | expr TRANSPOSE
     """
+
+def p_transpose(p):
+    """
+     expr : expr TRANSPOSE
+    """
+    p[0] = AST.Transposition(p[1])
 
 
 def p_if_stmt(p):
     """
     if_stmt : IF LPAREN expr RPAREN stmt %prec IFX
-            | IF LPAREN expr RPAREN stmt ELSE stmt
     """
     # pierwsza produckcja (%prec IFX) - gdy nie wiemy do ktorego ifa ma byc else
+    p[0] = AST.If(p[3], p[5])
+
+
+def p_if_else_stmt(p):
+    """
+    if_stmt : IF LPAREN expr RPAREN stmt ELSE stmt
+    """
+    p[0] = AST.If(p[3], p[5], p[7])
+
 
 def p_while_stmt(p):
     """
     while_stmt : WHILE LPAREN expr RPAREN stmt
     """
     p[0] = AST.While(p[3], p[5])
+
 
 def p_for_stmt(p):
     """
@@ -265,10 +295,12 @@ def p_range(p):
     """
     p[0] = AST.Range(p[1], p[3])
 
+
 def p_print(p):
     """
     print_stmt : PRINT list SEMICOLON
     """
+    p[0] = AST.FunctionCall(p[1], p[2])
 
 
 parser = yacc.yacc()
