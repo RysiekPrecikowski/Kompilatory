@@ -61,7 +61,7 @@ t_RANGE = r':'
 t_COMMA = r','
 t_SEMICOLON = r';'
 
-t_STRING = r'\"[^\"]*\"|\'[^\']*\''
+t_STRING = r'\"[^\"]*\"'
 
 
 def t_FLOATNUMBER(t):

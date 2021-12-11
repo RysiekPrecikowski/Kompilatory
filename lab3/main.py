@@ -1,8 +1,8 @@
-
-import sys
-import ply.yacc as yacc
-from lab2 import Mparser
 from lab1 import scanner
+import sys
+import Mparser
+
+import TreePrinter
 
 if __name__ == '__main__':
 
@@ -19,5 +19,4 @@ if __name__ == '__main__':
 
     text = file.read()
     ast = parser.parse(text, lexer=scanner.lexer)
-    print(ast)
     ast.printTree()
