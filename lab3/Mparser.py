@@ -7,8 +7,6 @@ from lab3 import AST
 
 tokens = scanner.tokens
 
-
-
 precedence = (
     ("left", "ASSIGN", 'INCREMENT', 'DECREMENT', 'MULTIPLY_ASSIGN', 'DIVIDE_ASSIGN'),
     ("left", "LESSER", 'GREATER', 'LESSER_EQUAL', 'GREATER_EQUAL', 'EQUALS', 'NOT_EQUAL'),
@@ -34,7 +32,7 @@ def p_program_simple(p):
     """
     program : stmt
     """
-    p[0] = AST.ProgramBlock(p[1])
+    p[0] = AST.ProgramBlock(p.lineno(1), p[1])
 
 
 def p_program_add(p):
@@ -55,6 +53,7 @@ def p_stmt(p):
     """
     p[0] = p[1]
 
+
 def p_program_block(p):
     """
     stmt : LPAREN_F stmt_list RPAREN_F
@@ -66,7 +65,8 @@ def p_stmt_list_start(p):
     """
     stmt_list : stmt
     """
-    p[0] = AST.ProgramBlock(p[1])
+    p[0] = AST.ProgramBlock(p.lineno(1), p[1])
+
 
 def p_stmt_list_add(p):
     """
@@ -75,13 +75,14 @@ def p_stmt_list_add(p):
     p[0] = p[1]
     p[0].stmts.append(p[2])
 
+
 def p_empty_stmt(p):
     """
     stmt : SEMICOLON
          | LPAREN_F RPAREN_F
     """
 
-    p[0] = AST.ProgramBlock()
+    p[0] = AST.ProgramBlock(p.lineno(1), )
     # print("p_empyt_stmt", p[0])
 
 
@@ -90,7 +91,7 @@ def p_break(p):
     stmt : BREAK SEMICOLON
     """
 
-    p[0] = AST.Break()
+    p[0] = AST.Break(p.lineno(1))
     # print("break", p[0])
 
 
@@ -98,7 +99,7 @@ def p_continue(p):
     """
     stmt : CONTINUE SEMICOLON
     """
-    p[0] = AST.Continue()
+    p[0] = AST.Continue(p.lineno(1))
     # print("continue", p[0])
 
 
@@ -110,12 +111,11 @@ def p_stmt_semicolon(p):
     # print("stmt semicolon", p[0])
 
 
-
 def p_return(p):
     """
     stmt : RETURN expr SEMICOLON
     """
-    p[0] = AST.Return(p[2])
+    p[0] = AST.Return(p.lineno(1), p[2])
 
 
 def p_comparison(p):
@@ -127,7 +127,7 @@ def p_comparison(p):
                | expr EQUALS expr
                | expr NOT_EQUAL expr
     """
-    p[0] = AST.BinExpr(p[2], p[1], p[3])
+    p[0] = AST.BinExpr(p.lineno(2), p[2], p[1], p[3])
 
 
 def p_operator(p):
@@ -137,13 +137,15 @@ def p_operator(p):
              | expr TIMES expr
              | expr DIVIDE expr
     """
-    p[0] = AST.BinExpr(p[2], p[1], p[3])
+    p[0] = AST.BinExpr(p.lineno(2), p[2], p[1], p[3])
+
 
 def p_uminus(p):
     """
     operator : MINUS expr %prec UMINUS
     """
-    p[0] = AST.UnaryMinus(p[2])
+    p[0] = AST.UnaryMinus(p.lineno(1), p[2])
+
 
 # def p_type_recognition(p):
 #     """
@@ -157,28 +159,28 @@ def p_Variable(p):
     """
     type_recognition : ID
     """
-    p[0] = AST.Variable(p[1])
+    p[0] = AST.Variable(p.lineno(1), p[1])
 
 
 def p_intNum(p):
     """
     type_recognition : NUMBER
     """
-    p[0] = AST.IntNum(p[1])
+    p[0] = AST.IntNum(p.lineno(1), p[1])
 
 
 def p_floatNum(p):
     """
     type_recognition : FLOATNUMBER
     """
-    p[0] = AST.FloatNum(p[1])
+    p[0] = AST.FloatNum(p.lineno(1), p[1])
 
 
 def p_string(p):
     """
     type_recognition : STRING
     """
-    p[0] = AST.String(p[1])
+    p[0] = AST.String(p.lineno(1), p[1])
 
 
 def p_single_operation(p):
@@ -202,7 +204,7 @@ def p_expression_operation(p):
                          | expr TIMES_MATRIX expr
                          | expr DIVIDE_MATRIX expr
     """
-    p[0] = AST.BinExpr(p[2], p[1], p[3])
+    p[0] = AST.BinExpr(p.lineno(2), p[2], p[1], p[3])
 
 
 def p_matrix_element_operation(p):
@@ -222,7 +224,8 @@ def p_matrix_reference(p):
     """
     lvalue : expr idx
     """
-    p[0] = AST.MatrixReference(p[1], p[2])
+    # print()
+    p[0] = AST.MatrixReference(p.lexer.lineno, p[1], p[2])
 
     # print("reference")
 
@@ -231,13 +234,15 @@ def p_idx(p):
     """
     idx : LPAREN_SQ list RPAREN_SQ
     """
-    p[0] = AST.IDX(p[2])
+    p[0] = AST.IDX(p.lineno(1), p[2])
+
 
 def p_list(p):
     """
     list : expr
     """
     p[0] = [p[1]]
+
 
 def p_list_add(p):
     """
@@ -246,11 +251,12 @@ def p_list_add(p):
     p[0] = p[1]
     p[0].append(p[3])
 
+
 def p_empty(p):
     """
     empty : LPAREN_SQ RPAREN_SQ
     """
-    p[0] = AST.IDX()
+    p[0] = AST.IDX(p.lineno(1))
 
 
 def p_special_matrix(p):
@@ -259,7 +265,8 @@ def p_special_matrix(p):
                    | ONES LPAREN list RPAREN
                    | ZEROS LPAREN list RPAREN
     """
-    p[0] = AST.FunctionCall(p[1], [p[3]])
+    # print(p[3])
+    p[0] = AST.FunctionCall(p.lineno(1), p[1], p[3])
 
 
 def p_epxr(p):
@@ -278,11 +285,12 @@ def p_epxr(p):
     # print("expr", p[1], type(p[1]))
     p[0] = p[1]
 
+
 def p_transpose(p):
     """
      expr : expr TRANSPOSE
     """
-    p[0] = AST.Transposition(p[1])
+    p[0] = AST.Transposition(p.lineno(1), p[1])
 
 
 def p_if_stmt(p):
@@ -290,21 +298,21 @@ def p_if_stmt(p):
     if_stmt : IF LPAREN expr RPAREN stmt %prec IFX
     """
     # pierwsza produckcja (%prec IFX) - gdy nie wiemy do ktorego ifa ma byc else
-    p[0] = AST.If(p[3], p[5])
+    p[0] = AST.If(p.lineno(1), p[3], p[5])
 
 
 def p_if_else_stmt(p):
     """
     if_stmt : IF LPAREN expr RPAREN stmt ELSE stmt
     """
-    p[0] = AST.If(p[3], p[5], p[7])
+    p[0] = AST.If(p.lineno(1), p[3], p[5], p[7])
 
 
 def p_while_stmt(p):
     """
     while_stmt : WHILE LPAREN expr RPAREN stmt
     """
-    p[0] = AST.While(p[3], p[5])
+    p[0] = AST.While(p.lineno(1), p[3], p[5])
 
 
 def p_for_stmt(p):
@@ -312,21 +320,21 @@ def p_for_stmt(p):
     for_stmt : FOR ID ASSIGN range stmt
     """
 
-    p[0] = AST.For(AST.Variable(p[2]), p[4], p[5])
+    p[0] = AST.For(p.lineno(1), AST.Variable(p.lineno(1), p[2]), p[4], p[5])
 
 
 def p_range(p):
     """
     range : expr RANGE expr
     """
-    p[0] = AST.Range(p[1], p[3])
+    p[0] = AST.Range(p.lineno(1), p[1], p[3])
 
 
 def p_print(p):
     """
     print_stmt : PRINT list SEMICOLON
     """
-    p[0] = AST.FunctionCall(p[1], p[2])
+    p[0] = AST.FunctionCall(p.lineno(1), p[1], p[2])
 
 
 parser = yacc.yacc()

@@ -85,6 +85,7 @@ for operator in ['<', '<=', '>', '>=', '!=', '==']:
 for operator in ['==', '!=']:
     type_table[operator][StringT][StringT] = BoolT
 
+
 class TypeChecker(NodeVisitor):
     def __init__(self):
         self.symbol_table = SymbolTable()
@@ -105,7 +106,7 @@ class TypeChecker(NodeVisitor):
         return type1
 
     def visit_String(self, node):
-        pass
+        return StringT
 
     def visit_BinExpr(self, node: AST.BinExpr):
         type_left = self.visit(node.left)
@@ -151,25 +152,58 @@ class TypeChecker(NodeVisitor):
         print(f"Line {node.line}: return outside function")
         return None
 
-    def visit_While(self, node):
-        pass
+    def visit_While(self, node: AST.While):
+        self.loop_count += 1
 
-    def visit_For(self, node):
-        pass
+        condt = self.visit(node.condition)
+        if condt != BoolT:
+            print(f'Line {node.line}: While condition is not boolean')
+
+        self.symbol_table.pushScope()
+        self.visit(node.stmt)
+        self.symbol_table.popScope()
+
+        self.loop_count -= 1
+
+    def visit_For(self, node: AST.For):
+        self.loop_count += 1
+        type1 = self.visit(node.range)
+        if type1 != 'range':
+            print(f'Line {node.line}: For loop error')
+
+        self.symbol_table.pushScope()
+        self.symbol_table.current_scope.put(node.id, IntT)
+
+        self.visit(node.stmt)
+
+        self.symbol_table.popScope()
+        self.loop_count -= 1
 
     def visit_Range(self, node):
         if not self.visit(node.min) == self.visit(node.max) == IntT:
             print(f"Line {node.line}: Range extremes must be integers")
         return RangeT
 
-    def visit_If(self, node):
-        pass
+    def visit_If(self, node: AST.If):
+        condt = self.visit(node.cond)
+        if condt != BoolT:
+            print(f'Line {node.line}: If condition is not boolean')
 
-    def visit_Break(self, node):
-        pass
+        self.symbol_table.pushScope()
+        self.visit(node.true)
+        self.symbol_table.popScope()
 
-    def visit_Continue(self, node):
-        pass
+        self.symbol_table.pushScope()
+        self.visit(node.false)
+        self.symbol_table.popScope()
+
+    def visit_Break(self, node: AST.Break):
+        if self.loop_count == 0:
+            print(f"Line {node.line}: Using break outside of loop")
+
+    def visit_Continue(self, node: AST.Continue):
+        if self.loop_count == 0:
+            print(f"Line {node.line}: Using continue outside of loop")
 
     def visit_FunctionCall(self, node: AST.FunctionCall):
         self.visit(node.args)
@@ -185,8 +219,17 @@ class TypeChecker(NodeVisitor):
             return ArrayT(len(node.args), FloatT, tuple(arg.value for arg in node.args))
         return AnyT
 
-    def visit_Assign(self, node):
-        pass
+    def visit_Assign(self, node: AST.Assign):
+        type1 = self.visit(node.val)
+        if isinstance(node.id, AST.MatrixReference):
+            type2 = self.symbol_table.get(node.id.target.id)
+            if type1 != type2.eltype:
+                print(f"Line {node.line}: Wrong types {type2.eltype}, {type1}")
+            return type1
+        else:
+            self.symbol_table.put(node.id.name, type1)
+        # print(f"doddaje {node.id.name, type1}")
+        return type1
 
     def visit_Transposition(self, node: AST.Transposition):
         type1 = self.symbol_table.get(node.val)

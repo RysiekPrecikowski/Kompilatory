@@ -2,39 +2,10 @@
 from collections import defaultdict
 
 
-# class VariableSymbol(Symbol):
-#
-#     def __init__(self, name, type):
-#         pass
-#     #
-#
-#
-# class SymbolTable(object):
-#
-#     def __init__(self, parent, name): # parent scope and symbol table name
-#         pass
-#     #
-#
-#     def put(self, name, symbol): # put variable symbol or fundef under <name> entry
-#         pass
-#     #
-#
-#     def get(self, name): # get variable symbol or fundef from <name> entry
-#         pass
-#     #
-#
-#     def getParentScope(self):
-#         pass
-#     #
-#
-#     def pushScope(self, name):
-#         pass
-#     #
-#
-#     def popScope(self):
-#         pass
-#     #
-#
+class VariableSymbol:
+    def __init__(self, name, type):
+        self.name = name
+        self.type = type
 
 
 class SymbolTable(object):
@@ -50,13 +21,19 @@ class SymbolTable(object):
         self.current_scope.dict[name] = symbol
 
     def get(self, name):
-        if name in self:
-            return self.dict[name]
+        scope = self.current_scope
 
-        if self.parent:
-            return self.parent.get(name)
+        while scope:
+            if name in scope.dict:
+                return scope.dict[name]
+
+            scope = scope.parent
 
         return None
 
-    def __contains__(self, item):
-        return item in self.dict
+    def pushScope(self):
+        self.current_scope = SymbolTable.Scope(self.current_scope)
+
+    def popScope(self):
+        pass
+
