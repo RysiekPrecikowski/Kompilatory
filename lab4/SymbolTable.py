@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from collections import defaultdict
 
 
 # class VariableSymbol(Symbol):
@@ -35,13 +36,18 @@
 #     #
 #
 
-class Scope:
-    def __init__(self, parent=None):
-        self.dict = {}
-        self.parent = parent
 
-    def put(self, name, symbol):
-        self.dict[name] = symbol
+class SymbolTable(object):
+    class Scope:
+        def __init__(self, parent=None):
+            self.dict = {}
+            self.parent = parent
+
+    def __init__(self):
+        self.current_scope = SymbolTable.Scope()
+
+    def put(self, name, symbol):# put variable symbol or fundef under <name> entry
+        self.current_scope.dict[name] = symbol
 
     def get(self, name):
         if name in self:

@@ -189,9 +189,10 @@ def p_single_operation(p):
                      | ID MULTIPLY_ASSIGN expr
                      | ID DIVIDE_ASSIGN expr
     """
-    p[0] = AST.Assign(p[2], AST.Variable(p[1]), p[3], )
 
-
+    p[0] = AST.Assign(p.lineno(1), p[2], AST.Variable(p.lineno(1), p[1]), p[3], )
+    # print(p[1], p[2], p[3])
+    # print("p_single_operation")
 
 
 def p_expression_operation(p):
@@ -212,7 +213,9 @@ def p_matrix_element_operation(p):
                              | lvalue MULTIPLY_ASSIGN expr
                              | lvalue DIVIDE_ASSIGN expr
     """
-    p[0] = AST.Assign(p[2], p[1], p[3])
+    # print("matrix element")
+
+    p[0] = AST.Assign(p.lineno(1), p[2], p[1], p[3])
 
 
 def p_matrix_reference(p):
@@ -221,6 +224,7 @@ def p_matrix_reference(p):
     """
     p[0] = AST.MatrixReference(p[1], p[2])
 
+    # print("reference")
 
 
 def p_idx(p):
@@ -251,9 +255,9 @@ def p_empty(p):
 
 def p_special_matrix(p):
     """
-    special_matrix : EYE LPAREN expr RPAREN
-                   | ONES LPAREN expr RPAREN
-                   | ZEROS LPAREN expr RPAREN
+    special_matrix : EYE LPAREN list RPAREN
+                   | ONES LPAREN list RPAREN
+                   | ZEROS LPAREN list RPAREN
     """
     p[0] = AST.FunctionCall(p[1], [p[3]])
 
@@ -269,7 +273,9 @@ def p_epxr(p):
          | special_matrix
          | empty
          | idx
+         | lvalue
     """
+    # print("expr", p[1], type(p[1]))
     p[0] = p[1]
 
 def p_transpose(p):
