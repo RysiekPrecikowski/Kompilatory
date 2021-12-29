@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from lab3 import AST
 
 
 class NodeVisitor(object):
@@ -38,7 +39,65 @@ class TypeChecker(NodeVisitor):
         # ...
         #
 
+    def visit_FloatNum(self, node):
+        pass
+
+    def visit_IntNum(self, node):
+        pass
+
     def visit_Variable(self, node):
         pass
 
+    def visit_String(self, node):
+        pass
 
+    def visit_BinExpr(self, node):
+        pass
+
+    def visit_UnaryMinus(self, node):
+        pass
+
+    def visit_ProgramBlock(self, node):
+        pass
+
+    def visit_Return(self, node):
+        pass
+
+    def visit_While(self, node):
+        pass
+
+    def visit_For(self, node):
+        pass
+
+    def visit_Range(self, node):
+        pass
+
+    def visit_If(self, node):
+        pass
+
+    def visit_Break(self, node):
+        pass
+
+    def visit_Continue(self, node):
+        pass
+
+    def visit_FunctionCall(self, node):
+        pass
+
+    def visit_Assign(self, node):
+        pass
+
+    def visit_Transposition(self, node):
+        pass
+
+    def visit_MatrixOperation(self, node):
+        pass
+
+    def visit_IDX(self, node):
+        pass
+
+    def visit_MatrixReference(self, node):
+        pass
+
+    def visit_Error(self, node):
+        pass
