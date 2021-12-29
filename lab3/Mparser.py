@@ -3,7 +3,7 @@ import ply.yacc as yacc
 from lab1 import scanner
 # from lab3 import AST
 # from lab3 import TreePrinter
-import AST
+from lab3 import AST
 
 tokens = scanner.tokens
 

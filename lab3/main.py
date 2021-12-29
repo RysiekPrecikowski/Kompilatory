@@ -1,6 +1,6 @@
 from lab1 import scanner
 import sys
-import Mparser
+from lab3 import Mparser
 
 import TreePrinter
 

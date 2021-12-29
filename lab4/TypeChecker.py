@@ -45,6 +45,7 @@ class TypeChecker(NodeVisitor):
     def visit_IntNum(self, node):
         pass
 
+
     def visit_Variable(self, node):
         pass
 
