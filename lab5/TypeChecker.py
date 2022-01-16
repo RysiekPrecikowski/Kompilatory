@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-from lab3 import AST
-from lab4.SymbolTable import SymbolTable
+import AST
+from SymbolTable import SymbolTable
 
 
 class NodeVisitor(object):
@@ -78,6 +78,8 @@ for operator in '+-*/':
     type_table[operator][FloatT][IntT] = FloatT
     type_table[operator][FloatT][FloatT] = FloatT
 
+type_table['*'][StringT][IntT] = StringT
+
 for operator in ['<', '<=', '>', '>=', '!=', '==']:
     type_table[operator][IntT][IntT] = BoolT
     type_table[operator][IntT][FloatT] = BoolT
@@ -115,18 +117,22 @@ class TypeChecker(NodeVisitor):
         type_right = self.visit(node.right)
         operator = node.op
 
+        # print(type_left, node.right)
+
         if operator[0] == '.':
             op = operator[1:]
             type1 = type_left.eltype if isinstance(type_left, ArrayT) else type_left
             type2 = type_right.eltype if isinstance(type_right, ArrayT) else type_right
 
-            if isinstance(type1, ArrayT) or isinstance(type2, ArrayT):
+            # print(type_left, type_right)
+
+            if isinstance(type_left, ArrayT) or isinstance(type_right, ArrayT):
                 type3 = type_table[op][type1][type2]
                 if type3 == AnyT:
                     print(
                         f'Line {node.line}: Can not apply {op} for {type1} and {type2}, expression will result in any type')
 
-                return ArrayT(type2.dims, type3, type2.size)
+                return ArrayT(type_right.dims, type3, type_right.size)
 
             print(f'Line {node.line}: Cannnot apply {op} for {type1} and {type2}, at least one argument must be array')
             return AnyT
@@ -173,8 +179,9 @@ class TypeChecker(NodeVisitor):
         if type1 != 'range':
             print(f'Line {node.line}: For loop error')
 
-        self.symbol_table.pushScope()
-        self.symbol_table.current_scope.put(node.id, IntT)
+        # self.symbol_table.pushScope()
+        # self.symbol_table.current_scope.put(node.id, IntT)
+        self.symbol_table.put(node.id.name, IntT)
 
         self.visit(node.stmt)
 
@@ -216,15 +223,15 @@ class TypeChecker(NodeVisitor):
 
         if node.fun in ['zeros', 'eye', 'ones']:
             if len(node.args) == 1:
-                return ArrayT(2, FloatT, (node.args[0].value, node.args[0].value))
+                return ArrayT(2, IntT, (node.args[0].value, node.args[0].value))
 
-            return ArrayT(len(node.args), FloatT, tuple(arg.value for arg in node.args))
+            return ArrayT(len(node.args), IntT, tuple(arg.value for arg in node.args))
         return AnyT
 
     def visit_Assign(self, node: AST.Assign):
         type1 = self.visit(node.val)
         if isinstance(node.id, AST.MatrixReference):
-            type2 = self.symbol_table.get(node.id.target.id)
+            type2 = self.symbol_table.get(node.id.target.name)
             if type1 != type2.eltype:
                 print(f"Line {node.line}: Wrong types {type2.eltype}, {type1}")
             return type1
@@ -234,7 +241,7 @@ class TypeChecker(NodeVisitor):
         return type1
 
     def visit_Transposition(self, node: AST.Transposition):
-        type1 = self.symbol_table.get(node.val)
+        type1 = self.symbol_table.get(node.val.name)
         if not isinstance(type1, ArrayT):
             print(f"Line {node.line}: Cannot transpose {type1}")
             return ArrayT(2, AnyT, (None, None))

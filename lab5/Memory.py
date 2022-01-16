@@ -1,38 +1,37 @@
 class Memory:
 
-    def __init__(self, name):
+    def __init__(self, parent=None):  # memory name
+        self.dict = dict()
+        self.parent = parent
 
-        pass  # memory name
+    def has_key(self, name):  # variable name
+        if name in self.dict:
+            return True
+        if self.parent == None:
+            return False
+        return self.parent.has_key(name)
 
-    def has_key(self, name):
+    def get(self, name):  # gets from memory current value of variable <name>
+        if name in self.dict:
+            return self.dict[name]
+        if self.parent == None:
+            return None
+        return self.parent.get(name)
 
-        pass  # variable name
-
-    def get(self, name):
-
-        pass  # gets from memory current value of variable <name>
-
-    def put(self, name, value):
-        pass  # puts into memory current value of variable <name>
+    def put(self, name, value):  # puts into memory current value of variable <name>
+        if self.parent and self.parent.has_key(name):
+            self.parent.put(name, value)
+        else:
+            self.dict[name] = value
 
 
 class MemoryStack:
 
-    def __init__(self, memory=None):
-
-        pass  # initialize memory stack with memory <memory>
-
-    def get(self, name):  # gets from memory stack current value of variable <name>
-        pass
-
-    def insert(self, name, value):  # inserts into memory stack variable <name> with value <value>
-        pass
-
-    def set(self, name, value):  # sets variable <name> to value <value>
-        pass
+    def __init__(self, memory=None):  # initialize memory stack with memory <memory>
+        self.stack = []
 
     def push(self, memory):  # pushes memory <memory> onto the stack
-        pass
+        self.stack.append(memory)
 
     def pop(self):  # pops the top memory from the stack
-        pass
+        return self.stack.pop()
