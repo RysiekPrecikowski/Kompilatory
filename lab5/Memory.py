@@ -1,18 +1,26 @@
-
 class Memory:
 
-    def __init__(self, name): # memory name
+    def __init__(self, name):
 
-    def has_key(self, name):  # variable name
+        pass  # memory name
 
-    def get(self, name):         # gets from memory current value of variable <name>
+    def has_key(self, name):
+
+        pass  # variable name
+
+    def get(self, name):
+
+        pass  # gets from memory current value of variable <name>
 
     def put(self, name, value):  # puts into memory current value of variable <name>
 
 
+
 class MemoryStack:
 
-    def __init__(self, memory=None): # initialize memory stack with memory <memory>
+    def __init__(self, memory=None):
+
+        pass  # initialize memory stack with memory <memory>
 
     def get(self, name):             # gets from memory stack current value of variable <name>
 
