@@ -8,10 +8,16 @@ import sys
 
 sys.setrecursionlimit(10000)
 
+
+
 class Interpreter(object):
 
 
     @on('node')
+    def visit(self, node):
+        pass
+
+    @when(AST.Node)
     def visit(self, node):
         pass
 
